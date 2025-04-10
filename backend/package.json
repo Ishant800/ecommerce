@@ -5,31 +5,38 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/app.ts"
+    "start": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/cookie-parser": "^1.4.8",
-    "@types/jsonwebtoken": "^9.0.9",
+   
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
+    "connect-redis": "^8.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "express-router": "^0.0.1",
+    "express-session": "^1.18.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "mysql2": "^3.13.0"
+    "mysql2": "^3.13.0",
+    "redis": "^4.7.0"
   },
-  "devDependencies": {
+  "devDependencies": { 
+    "@types/bcrypt": "^5.0.2",
+  "@types/connect-redis": "^0.0.23",
+  "@types/cookie-parser": "^1.4.8",
+  "@types/express-session": "^1.18.1",
+  "@types/jsonwebtoken": "^9.0.9",
+  "@types/redis": "^4.0.11",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.10",

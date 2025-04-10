@@ -2,9 +2,12 @@ import { Request,Response } from "express"
 import pool from '../database/database'
 import  User  from "../models/user";
 import { RowDataPacket } from "mysql2";
-
+import { createClient } from "redis";
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken")
+import {publisher} from '../controllers/productcontrollers'
+import { time } from "console";
+
 
 export const userregister = async (req: Request, res: Response) => {
     try {
@@ -25,8 +28,7 @@ export const userregister = async (req: Request, res: Response) => {
             [username, email, hashedPassword,role]
         );
 
-        console.log("Insert Query Result:", result); // ✅ Debugging
-
+        
         if (result.affectedRows > 0) {
             return res.status(201).json({ message: "User registered successfully" });
         } else {
@@ -43,7 +45,7 @@ export const userlogin = async(req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
-        // Query the database for the user
+        
         const [rows]: any = await pool.query("SELECT * FROM user WHERE email = ?", [email]);
 
         if (rows.length === 0) {
@@ -57,7 +59,7 @@ export const userlogin = async(req: Request, res: Response) => {
         if (!ismatched) {
             return res.status(401).json({ message: "Password not matched" });
         }
-
+          
         // Generate JWT token
 
         const acesstoken = jwt.sign({ id: user.id, role: user.role }, process.env.SECRETE_KEY as string, { expiresIn: '2d' });
@@ -67,6 +69,22 @@ const token = jwt.sign(
   process.env.SECRETE_KEY as string,
   { expiresIn: '2d' }
 );
+console.log("user login sucessfully")
+const username = email.split("@gmail.com")
+
+//redis 
+await publisher.publish(
+    "user:activity",
+    JSON.stringify({
+        type:"login",
+        
+        name:username[0],
+        email:email,
+        time: new Date().toISOString(),
+        role:user.role
+    })
+)
+
 
 // Send response with user details and token
 return res.status(200)
@@ -77,8 +95,8 @@ return res.status(200)
     } catch (error) {
         console.error("Login error:", error);
         return res.status(400).json({ message: "User login failed", error });
-    }
-};
+    } 
+}; 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const [rows] = await pool.query<User[] & RowDataPacket[]>("SELECT * FROM user");
@@ -87,3 +105,4 @@ export const getAllUsers = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Error fetching users", error });
     }
 };
+

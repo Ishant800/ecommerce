@@ -1,28 +1,37 @@
+// src/app.ts
+// import express from 'express';]
+export const express = require('express')
+import pool from './database/database';
+import Redis from 'ioredis';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import authRoute from './Routes/authRoute';
+import router from './Routes/productroute';
+import { listenToUserEvents } from './controllers/productcontrollers';
 
-const pool = require('./database/database')
-const express = require('express')
-const cors = require("cors")
-const dotenv = require("dotenv")
-dotenv.config()
-const app = express()
-import cookieParser from 'cookie-parser'
-import authRoute from './Routes/authRoute'
-import router from './Routes/productroute'
+dotenv.config();
+
+export const app = express();
+
+// Redis setup
+export const publisher = new Redis();
+export const subscriber = new Redis();
+
+// Middlewares
 app.use(cors({ 
     origin: "http://localhost:5173", 
     credentials: true,
-  }));
-  
-app.use(express.json())
-app.use(cookieParser())
+}));
+app.use(express.json()); 
+app.use(cookieParser());
 
-//database integration
-pool
-app.use("/user",authRoute)
-app.use("/product",router)
+// DB pool
+pool;
 
-const port = process.env.PORT
-app.listen(port,()=>{
-    console.log(`server run on port ${port}`)
-})
- 
+// Routes
+app.use("/user", authRoute);
+app.use("/product", router);
+
+// Redis events
+listenToUserEvents();
